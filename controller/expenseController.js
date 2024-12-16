@@ -1,3 +1,4 @@
+const { default: mongoose } = require('mongoose')
 const Expenses = require('../models/expenseModel')
 
 const getExpenses = async (req, res) => {
@@ -45,7 +46,7 @@ const deleteExpense = async (req, res) => {
     try {
         const deletedExpense = await Expenses.findByIdAndDelete(id)
         if (!deletedExpense) return res.status(404).json({ message: "Expense not found" });
-        res.status(200).json({message: "Deleted Successfully"})
+        res.status(200).json({ message: "Deleted Successfully" })
     } catch (err) {
         res.status(500).json({ message: err.message })
     }
@@ -54,7 +55,7 @@ const deleteExpense = async (req, res) => {
 const expenseSummary = async (req, res) => {
     try {
         const summary = await Expenses.aggregate([
-            { $match: { user: req.user } },
+            { $match: { user: new mongoose.Types.ObjectId(req.user) } },
             { $group: { _id: "$category", total: { $sum: "$amount" } } },
             { $sort: { total: -1 } }
         ])
